@@ -1,0 +1,19 @@
+version: "3.8"
+
+services:
+  lilythebest:
+    container_name: lilythebest
+    build: .
+    ports:
+      - "80"
+    restart: unless-stopped
+    networks:
+      - traefik
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.lilythebest.rule=Host(`lilythebest.com`)
+
+networks:
+  traefik:
+    external:
+      name: traefik
