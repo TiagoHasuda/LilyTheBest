@@ -41,13 +41,18 @@ export default function AniversarioDaGata() {
         </div>
       )
     }
+    newRainParticles.push(
+      <div className={styles.rainParticle} id={`rainParticle${rainParticleCount}`} key={rainParticleCount}>
+        <img className={styles.ballon} src={`/balloons/cat.png`} />
+      </div>
+    )
     setRainParticles(newRainParticles)
   }
 
   const renderRain = async () => {
     const rainParticlesRefs: HTMLElement[] = []
     let i: number, particle
-    for (i = 0; i < rainParticleCount; i++) {
+    for (i = 0; i <= rainParticleCount; i++) {
       particle = document.getElementById(`rainParticle${i}`)
       if (particle === null) {
         rainTrigger.current += "a"
