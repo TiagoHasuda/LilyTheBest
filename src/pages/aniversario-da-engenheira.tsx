@@ -1,6 +1,19 @@
-import { ChangeEvent, useRef, useState } from "react"
+import { ChangeEvent, ReactNode, useEffect, useRef, useState } from "react"
 import styles from "../styles/404.module.css"
 import { Decode } from "@/utils/encription"
+import { sleep } from "@/utils/sleep.util"
+import { getRandomNum } from "@/utils/random.util"
+
+const rainParticleCount: number = 20
+
+const balloons = [
+  "blue_2",
+  "blue",
+  "green",
+  "purple",
+  "red",
+  "yellow",
+]
 
 export default function AniversarioDaGata() {
   const [showModal, setShowModal] = useState(false)
@@ -8,7 +21,65 @@ export default function AniversarioDaGata() {
   const [secret, setSecret] = useState('')
   const [hashedMessage, setHashedMessage] = useState('')
   const [typing, setTyping] = useState(false)
+  const [rainParticles, setRainParticles] = useState<ReactNode[]>([])
+  const ongoingRain = useRef(false)
+  const rainTrigger = useRef("")
   const debounceRef = useRef<NodeJS.Timeout>()
+
+  const startBallons = () => {
+    ongoingRain.current = true
+    renderRain()
+  }
+
+  const renderRainParticles = () => {
+    const newRainParticles: ReactNode[] = []
+    for (let i = 0; i < rainParticleCount; i++) {
+      const randomBalloon = balloons[Math.floor(Math.random() * 6)]
+      newRainParticles.push(
+        <div className={styles.rainParticle} id={`rainParticle${i}`} key={i}>
+          <img className={styles.ballon} src={`/balloons/balloon_${randomBalloon}.png`} />
+        </div>
+      )
+    }
+    setRainParticles(newRainParticles)
+  }
+
+  const renderRain = async () => {
+    const rainParticlesRefs: HTMLElement[] = []
+    let i: number, particle
+    for (i = 0; i < rainParticleCount; i++) {
+      particle = document.getElementById(`rainParticle${i}`)
+      if (particle === null) {
+        rainTrigger.current += "a"
+        return
+      }
+      rainParticlesRefs.push(particle)
+      particle.style.top = `${window.innerHeight}px`
+      particle.style.visibility = "visible"
+    }
+
+    let randomLeft, randomDelay
+    while (ongoingRain.current) {
+      for (i = 0; i < rainParticlesRefs.length; i++) {
+        if (!ongoingRain.current) return
+        const curr = rainParticlesRefs[i]
+        if (curr.offsetTop < window.innerHeight && curr.offsetTop > 0) {
+          await sleep(100)
+          continue
+        }
+        randomDelay = getRandomNum(500, 1000)
+        await sleep(randomDelay)
+        randomLeft = getRandomNum(0, window.innerWidth)
+        curr.style.left = `${randomLeft}px`
+        curr.style.transition = "top 10000ms linear"
+        curr.style.top = "-100px"
+        setTimeout(() => {
+          curr.style.transition = "none"
+          curr.style.top = `${window.innerHeight}px`
+        }, 10000)
+      }
+    }
+  }
 
   const submit = () => {
     if (!hashedMessage.trim()) return
@@ -42,6 +113,15 @@ export default function AniversarioDaGata() {
     setShowModal(true)
   }
 
+  useEffect(() => {
+    renderRainParticles()
+  }, [])
+
+  useEffect(() => {
+    if (!ongoingRain.current && rainParticles.length)
+      startBallons()
+  }, [rainParticles])
+
   return (
     <div className={styles.container} style={{flexDirection: "column"}}>
       <div className={styles.form}>
@@ -64,6 +144,9 @@ export default function AniversarioDaGata() {
       <img src="/cuts/right.png" className={styles.leftImg} />
       <img src="/cuts/up.png" className={styles.upImg} />
       <img src="/cuts/left.png" className={styles.rightImg} />
+      <div className={styles.rainContainer}>
+        {rainParticles}
+      </div>
     </div>
   )
 }

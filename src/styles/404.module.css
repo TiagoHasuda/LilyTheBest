@@ -125,3 +125,25 @@
   width: 150px;
   pointer-events: none;
 }
+
+.rainContainer {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.rainParticle {
+  position: absolute;
+  z-index: 1;
+  font-size: 30px;
+  transition: top 4000ms linear;
+  visibility: hidden;
+}
+
+.ballon {
+  width: 40px;
+}
