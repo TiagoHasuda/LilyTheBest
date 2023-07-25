@@ -2,6 +2,7 @@ import { ReactNode, useEffect, useRef, useState } from "react"
 import styles from '../styles/presente.module.css'
 import { sleep } from "@/utils/sleep.util";
 import { getRandomNum } from "@/utils/random.util";
+import ConfettiExplosion from 'react-confetti-explosion';
 
 const questions = [
     {
@@ -122,6 +123,7 @@ export default function Aniversario() {
     const [answer, setAnwser] = useState('_____ ____');
     const [rainParticles, setRainParticles] = useState<ReactNode[]>([])
     const [finished, setFinished] = useState(false);
+    const [confettiExplosion, setConfettiExplosion] = useState(false);
     const ongoingRain = useRef(false)
     const rainTrigger = useRef("")
 
@@ -149,11 +151,14 @@ export default function Aniversario() {
                 questionContainer.style.display = 'none';
                 let i = 0;
                 let beforeMessage = '';
+                setConfettiExplosion(true)
                 for (i = 0; i < beforePause.length; i++) {
                     beforeMessage += beforePause[i];
                     answerDiv.innerHTML = beforeMessage + 'Bruno Mars';
                     await sleep(50);
                 }
+                setFinished(true)
+                renderRainParticles()
                 await sleep(500);
                 for (i = 0; i < afterPause.length; i++) {
                     beforeMessage += afterPause[i];
@@ -164,8 +169,6 @@ export default function Aniversario() {
                     answerDiv.innerHTML += afterAnswer[i];
                     await sleep(50);
                 }
-                setFinished(true)
-                renderRainParticles()
             }
         }
     }
@@ -262,6 +265,7 @@ export default function Aniversario() {
                     {rainParticles}
                 </div>
             }
+            {confettiExplosion && <ConfettiExplosion duration={5000} height={1800} particleCount={200} />}
         </div>
     )
 }
